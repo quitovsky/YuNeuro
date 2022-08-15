@@ -76,8 +76,8 @@ bot.command("say", async(ctx) => {
 })
 
 bot.on('message', async(ctx) => {
+    const chat = ctx.chat.id;
     if(ctx.message.text && ctx.chat.type === "group" && !ctx.from.is_bot) {
-        const chat = ctx.chat.id;
         ifTableExists(chat, () => {
             const text = ctx.message.text.toLowerCase().replace("\n", " ");
             const words = text.split(" ");
@@ -93,6 +93,15 @@ bot.on('message', async(ctx) => {
                     }
                 }
             }
+        })
+    }
+    if(ctx.message.message_id % 20 === 0) {
+        db.all(`SELECT word FROM "${chat}" ORDER BY RANDOM() LIMIT 5`, (err, rows) => {
+            if(err) return console.log(err);
+            let msg = rows.map((item) => item.word).join(" ");
+            if(msg.endsWith(",")) msg = msg.slice(0, -1);
+            msg = msg.slice(0,1).toUpperCase() + msg.slice(1);
+            ctx.reply(msg)
         })
     }
 })

@@ -75,6 +75,17 @@ bot.command("say", async(ctx) => {
     }
 })
 
+bot.command('stat', async(ctx) => {
+    const chat = ctx.chat.id;
+    if(ctx.chat.type === "group") {
+        ifTableExists(chat, () => {
+            db.all(`SELECT COUNT(word) FROM "${chat}"`, (err, rows) => {
+                ctx.reply(`Фраз/слов в базе данных: ${rows[0]["COUNT(word)"]}`)
+            })
+        })
+    }
+})
+
 bot.on('message', async(ctx) => {
     const chat = ctx.chat.id;
     if(ctx.message.text && ctx.chat.type === "group" && !ctx.from.is_bot) {

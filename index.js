@@ -82,7 +82,7 @@ bot.on('message', async(ctx) => {
             const text = ctx.message.text.toLowerCase().replace("\n", " ");
             const words = text.split(" ");
             if(Math.random() > 0.5) {
-                if(words.length <=5) {
+                if(words.length <=5 && words.length > 1) {
                     insertWord(chat, text)
                 }
             }

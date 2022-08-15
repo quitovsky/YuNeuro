@@ -1,2 +1,4 @@
 /node_modules
 /.vscode
+/dev.js
+/index.db

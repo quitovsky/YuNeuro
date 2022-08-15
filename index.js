@@ -53,10 +53,24 @@ bot.command("say", async(ctx) => {
     if(ctx.chat.type === "group") {
         const chat = ctx.chat.id;
         ifTableExists(chat, () => {
-            db.all(`SELECT word FROM "${chat}" ORDER BY count DESC, RANDOM() LIMIT 15`, (err, rows) => {
-                if(err) return console.log(err);
-                ctx.reply(rows.map((item) => item.word).join(" "))
-            })
+            let arg = ctx.message.text.split(" ")[1]
+            if(isNaN(arg)) {
+                db.all(`SELECT word FROM "${chat}" ORDER BY RANDOM() LIMIT 15`, (err, rows) => {
+                    if(err) return console.log(err);
+                    let msg = rows.map((item) => item.word).join(" ");
+                    if(msg.endsWith(",")) msg = msg.slice(0, -1);
+                    msg = msg.slice(0,1).toUpperCase() + msg.slice(1);
+                    ctx.reply(msg)
+                })
+            } else {
+                db.all(`SELECT word FROM "${chat}" ORDER BY RANDOM() LIMIT ${arg}`, (err, rows) => {
+                    if(err) return console.log(err);
+                    let msg = rows.map((item) => item.word).join(" ");
+                    if(msg.endsWith(",")) msg = msg.slice(0, -1);
+                    msg = msg.slice(0,1).toUpperCase() + msg.slice(1);
+                    ctx.reply(msg)
+                })
+            }
         })
     }
 })
@@ -65,7 +79,7 @@ bot.on('message', async(ctx) => {
     if(ctx.message.text && ctx.chat.type === "group" && !ctx.from.is_bot) {
         const chat = ctx.chat.id;
         ifTableExists(chat, () => {
-            const text = ctx.message.text.toLowerCase();
+            const text = ctx.message.text.toLowerCase().replace("\n", " ");
             const words = text.split(" ");
             if(Math.random() > 0.5) {
                 if(words.length <=5) {
